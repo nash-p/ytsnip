@@ -75,11 +75,36 @@ def mince(audio_file, folder_name, mince_length):
     return ffmpeg.run(out)
 
 
+def batch(batch_file):
+
+    file = open(batch_file)
+    count = 0
+    for line in file:
+        if line == "\n":
+            continue
+
+        url, filename, start, stop, mince_length = line.split(",")
+        url = url.strip()
+        filename = filename.strip()
+        start = start.strip()
+        stop = stop.strip()
+        mince_length = mince_length.strip()
+
+        stream_url, title = get_url(url)
+
+        title = filename
+        mince_folder = title.rsplit(".")[0]
+
+        start = get_secs(start)
+        stop = get_secs(stop)
+
+        snip_url(stream_url, title, start, stop)
+        mince("../../" + title, mince_folder, mince_length)
+
+
 def main(argv):
 
-    usage_str = (
-        "main.py -u <url> [-o <outputfile> -s <starttime> -t <stoptime> -m [<length>]]"
-    )
+    usage_str = "main.py [-b <batchfile>][-u <url> [-o <outputfile> -s <starttime> -t <stoptime> -m [<length>]]]"
 
     target_url = ""
     out_filename = ""
@@ -88,10 +113,13 @@ def main(argv):
     mince_folder = ""
     mince_length = 0
     to_mince = False
+    batch_file = None
 
     try:
         opts, args = getopt.getopt(
-            argv, "hu:ostm", ["url=", "ofile=", "start=", "terminate=", "mince="]
+            argv,
+            "hb:u:ostm",
+            ["batch=", "url=", "ofile=", "start=", "terminate=", "mince="],
         )
 
     except getopt.GetoptError:
@@ -102,6 +130,15 @@ def main(argv):
         if opt == "-h":
             print(usage_str)
             sys.exit()
+        elif opt in ("-b", "--batch"):
+            batch_file = arg
+
+            if batch_file == None:
+                print(usage_str)
+                sys.exit(2)
+
+            batch(batch_file)
+            sys.exit(0)
         elif opt in ("-u", "--url"):
             target_url = arg
         elif opt in ("-o", "--ofile"):
@@ -113,10 +150,6 @@ def main(argv):
         elif opt in ("-m", "--mince"):
             to_mince = True
             mince_length = arg
-
-        if target_url == "":
-            print(usage_str)
-            sys.exit(2)
 
         # URLs may have seperators
         target_url = target_url.rsplit("?")[0]

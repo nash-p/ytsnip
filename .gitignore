@@ -3,6 +3,7 @@
 .vscode
 *.pyc
 temp.py
-test.m4a
+test.*
 out/
 out.*
+tests/test_batch.txt
