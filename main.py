@@ -1,7 +1,5 @@
-from unittest.loader import VALID_MODULE_NAME
 from yt_dlp import YoutubeDL as ydl
-import ffmpeg
-import sys, getopt
+import ffmpeg, sys, getopt
 
 
 test_url = "https://youtu.be/FtutLA63Cp8"  # Bad Apple, because yes
@@ -50,9 +48,10 @@ def get_url(url):
 
 def snip_url(url, title, start, end):
     input = ffmpeg.input(url)
-    audio = input.audio
-    # stream = ffmpeg.trim(audio, 60)
-    out = ffmpeg.output(audio, ("out/" + title), ss=start, to=end)
+    pts = "PTS-STARTPTS"
+    audio = input.filter_("atrim", start=start, end=end).filter_("asetpts", pts)
+    out = ffmpeg.output(audio, ("out/" + title))
+
     return ffmpeg.run(out)
 
 
@@ -65,7 +64,7 @@ def main(argv):
     target_url = ""
     out_filename = ""
     start_time = "0"
-    stop_time = ""
+    stop_time = "60"
 
     try:
         opts, args = getopt.getopt(
@@ -89,6 +88,13 @@ def main(argv):
         elif opt in ("-t", "--terminate"):
             stop_time = arg
 
+        if target_url == "":
+            print(usage_str)
+            sys.exit(2)
+
+        # Clean up URL
+        target_url = target_url.rsplit("?")[0]
+
     stream_url, title = get_url(target_url)
     if out_filename != "":
         title = out_filename
@@ -99,10 +105,4 @@ def main(argv):
 
 if __name__ == "__main__":
 
-    # ydl_opts = {}
-    # raw = ydl(ydl_opts).extract_info(
-    #     "https://youtu.be/uqnZsyijjkY", download=False
-    # )  # dict of lists
-    # info = ydl.sanitize_info(raw)
-    # print(info)
     main(sys.argv[1:])
