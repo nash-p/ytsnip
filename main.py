@@ -2,9 +2,9 @@ from yt_dlp import YoutubeDL as ydl
 import ffmpeg, sys, getopt
 
 
-test_url = "https://youtu.be/FtutLA63Cp8"  # Bad Apple, because yes
-test_start = 6
-test_end = 36
+default_url = "https://youtu.be/FtutLA63Cp8"  # Bad Apple, because yes
+default_start = "5"
+default_end = "15"
 
 
 def get_secs(time_str) -> int:  # hehe
@@ -47,10 +47,12 @@ def get_url(url):
 
 
 def snip_url(url, title, start, end):
-    input = ffmpeg.input(url)
-    pts = "PTS-STARTPTS"
-    audio = input.filter_("atrim", start=start, end=end).filter_("asetpts", pts)
-    out = ffmpeg.output(audio, ("out/" + title))
+
+    end = str(end - start)
+    start = str(start)
+    input = ffmpeg.input(url, ss=(start), t=(end))
+    audio = input.audio
+    out = audio.output(audio, ("out/" + title))
 
     return ffmpeg.run(out)
 
@@ -63,8 +65,8 @@ def main(argv):
     usage_str = "main.py -u <url> -o <outputfile> -s <starttime> -t <stoptime>"
     target_url = ""
     out_filename = ""
-    start_time = "0"
-    stop_time = "60"
+    start_time = default_start
+    stop_time = default_end
 
     try:
         opts, args = getopt.getopt(
@@ -92,7 +94,7 @@ def main(argv):
             print(usage_str)
             sys.exit(2)
 
-        # Clean up URL
+        # URLs may have seperators
         target_url = target_url.rsplit("?")[0]
 
     stream_url, title = get_url(target_url)
