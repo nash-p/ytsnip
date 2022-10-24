@@ -4,4 +4,4 @@
 *.pyc
 temp.py
 test.m4a
-out.mp4
+out/
