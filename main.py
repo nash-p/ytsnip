@@ -100,6 +100,7 @@ def batch(batch_file):
 
         snip_url(stream_url, title, start, stop)
         mince("../../" + title, mince_folder, mince_length)
+        os.chdir(cur_path)
 
 
 def main(argv):
@@ -170,6 +171,7 @@ def main(argv):
     snip_url(stream_url, title, start_time, stop_time)
     if to_mince:
         mince("../../" + title, mince_folder, mince_length)
+        os.chdir(cur_path)
 
 
 if __name__ == "__main__":
