@@ -11,6 +11,8 @@ yt-dlp -g "https://youtube.com/watch?fakeurl"
 2. Pass its output to ffmpeg
 ffmpeg -ss 00:00:15.00 -i "OUTPUT-OF-FIRST URL" -t 00:00:10.00 -c copy out.mp4
 
+3. Add mincing and batch file support
+
 where 00:00:00.00 is format HH:MM:SS.ms
 
 simple
