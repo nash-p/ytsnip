@@ -32,8 +32,8 @@ def get_secs(time_str) -> int:  # hehe
 def get_url(url):
 
     ydl_opts = {}
-    raw = ydl(ydl_opts).extract_info(url, download=False)  # dict of lists
-    info = ydl.sanitize_info(raw)
+    info = ydl(ydl_opts).extract_info(url, download=False)  # dict of lists
+    # info = ydl.sanitize_info(info)
 
     title = info["title"].strip() + ".mp4"
 
@@ -98,4 +98,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
+
+    # ydl_opts = {}
+    # raw = ydl(ydl_opts).extract_info(
+    #     "https://youtu.be/uqnZsyijjkY", download=False
+    # )  # dict of lists
+    # info = ydl.sanitize_info(raw)
+    # print(info)
     main(sys.argv[1:])
